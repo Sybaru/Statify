@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
 const querystring = require("querystring");
+const { v4 } = require('uuid');
 
 var scopes = [
   "user-read-private",
@@ -49,7 +50,7 @@ var port = process.env.PORT || 3001;
 app.use(express.json());
 app.use(cors());
 
-app.listen(3001, () => {
+app.listen(port, () => {
   console.log("running server");
 });
 
@@ -515,7 +516,7 @@ app.get("/recommendations", (req, res) => {
         res.send(error);
       });
   });
-}); 
+});
 
 app.get("/search", (req, res) => {
   console.log("searching for " + req.query.q);
@@ -549,3 +550,5 @@ app.get("/search", (req, res) => {
       });
   });
 });
+
+module.exports = app;
