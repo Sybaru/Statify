@@ -1,32 +1,52 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { getCurrentUserPlaylists } from '../Spotify/spotify';
-import { catchErrors } from '../utils';
-import { SectionWrapper, PlaylistsGridWrap } from '../components';
+import { useState, useEffect } from "react";
+import axios from "axios";
+import {
+  getCurrentUserPlaylists,
+  createNewPlaylist,
+  getCurrentUserProfile,
+  accessToken,
+} from "../Spotify/spotify";
+import { catchErrors } from "../utils";
+import { SectionWrapper, PlaylistsGridWrap } from "../components";
 
 const Playlists = () => {
+  const [token, setToken] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [playlistsData, setPlaylistsData] = useState(null);
   const [playlists, setPlaylists] = useState(null);
+  const [newPlaylist, setNewPlaylist] = useState(null);
+
+  const removeDuplicates = (arr) => {
+    var map = new Map(arr.map((o) => [o.id, o]));
+    return [...map.values()];
+  };
+
+  const handleCreateNewPlaylist = async () => {
+    const { data } = await createNewPlaylist(profile.data.id);
+    console.log(data);
+    window.location.href = `/playlists/${data.id}`;
+  };
 
   useEffect(() => {
+    setToken(accessToken);
+
     const fetchData = async () => {
+      const profile = await getCurrentUserProfile();
+      setProfile(profile);
+
       const { data } = await getCurrentUserPlaylists();
       setPlaylistsData(data);
-    };
-    console.log(playlists);
 
+      console.log(data);
+    };
     catchErrors(fetchData());
   }, []);
 
-  // When playlistsData updates, check if there are more playlists to fetch
-  // then update the state variable
   useEffect(() => {
     if (!playlistsData) {
       return;
     }
 
-    // Playlist endpoint only returns 20 playlists at a time, so we need to
-    // make sure we get ALL playlists by fetching the next set of playlists
     const fetchMoreData = async () => {
       if (playlistsData.next) {
         const { data } = await axios.get(playlistsData.next);
@@ -34,25 +54,20 @@ const Playlists = () => {
       }
     };
 
-    // Use functional update to update playlists state variable
-    // to avoid including playlists as a dependency for this hook
-    // and creating an infinite loop
-    setPlaylists(playlists => ([
-      ...playlists ? playlists : [],
-      ...playlistsData.items
-    ]));
+    setPlaylists((playlists) => [
+      ...(playlists ? playlists : []),
+      ...playlistsData.items,
+    ]);
 
-    // Fetch next set of playlists as needed
     catchErrors(fetchMoreData());
-
   }, [playlistsData]);
 
   return (
     <main>
-      <SectionWrapper title="Public Playlists" breadcrumb={true}>
-        {playlists && (
-          <PlaylistsGridWrap playlists={playlists} wr={true}/>
-        )}
+      <SectionWrapper title="Public Playlists" breadcrumb={true} returnlink="/profile">
+        <button onClick={handleCreateNewPlaylist}>Create New Playlist</button>
+
+        {playlists && <PlaylistsGridWrap playlists={removeDuplicates(playlists)} wr={true} />}
       </SectionWrapper>
     </main>
   );

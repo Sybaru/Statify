@@ -13,13 +13,18 @@ import Home from "./Home";
 import Artist from "./Artist";
 import Album from "./Album";
 import User from "./User";
+import Track from "./Track";
+import Saved from "./Saved";
+import PlaylistEdit from "./PlaylistEdit";
+import RecentlyPlayed from "./RecentlyPlayed";
+import Search from "./Search";
 import styled from "styled-components/macro";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 const StyledLogoutButton = styled.button`
   position: absolute;
-  top: var(--spacing-sm);
+  top: 15px;
   right: var(--spacing-md);
   padding: var(--spacing-xs) var(--spacing-sm);
   background-color: rgba(0, 0, 0, 0.7);
@@ -35,7 +40,7 @@ const StyledLogoutButton = styled.button`
 
 const StyledNavButton = styled.button`
   position: relative;
-  top: var(--spacing-sm);
+  top: 15px;
   left: var(--spacing-md);
   margin: 0 5px;
   background-color: rgba(0, 0, 0, 0.7);
@@ -88,6 +93,7 @@ export default function Body() {
         <Route path="/top-tracks" element={<TopTracks />} />
         <Route path="/playlists/:id" element={<Playlist />} />
         <Route path="/playlists" element={<Playlists />} />
+        <Route path="/edit/:id" element={<PlaylistEdit />} />
         <Route path="/artist/:id" element={<Artist />} />
         <Route path="/album/:id" element={<Album />} />
         <Route
@@ -95,6 +101,11 @@ export default function Body() {
           element={<Profile token={token} setToken={setToken} />}
         />
         <Route path="/user/:id" element={<User />} />
+        <Route path="/track/:id" element={<Track />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/search/:query" element={<Search />} />
+        <Route path="/saved" element={<Saved />} />
+        <Route path="/recently-played" element={<RecentlyPlayed />} />
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Home />} />
       </Routes>

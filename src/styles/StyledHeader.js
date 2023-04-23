@@ -66,13 +66,15 @@ const StyledHeader = styled.header`
   }
 
   h1.header__name {
-    font-size: clamp(2.5rem, 10vw, 6rem);
+    font-size: clamp(20px, 10vw, 5rem);
     font-weight: 900;
     line-height: 1;
     margin: 10 0 0 0;
     position: relative;
     top: -50px;
     white-space: nowrap; 
+    outline: 0px solid transparent;
+    width: 50vw;
 
     @media (min-width: 768px) {
       margin: 0 0 0 -5px;
@@ -113,6 +115,12 @@ const StyledHeader = styled.header`
   .songs {
     font-weight: bold;
     color: var(--white);
+  }
+
+  .edit__button {
+    position: relative;
+    margin-left: 20px;
+
   }
 `;
 

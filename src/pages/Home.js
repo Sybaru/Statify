@@ -1,9 +1,14 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { accessToken } from "../Spotify/spotify";
-import { SectionWrapper, ArtistsGrid, PlaylistsGrid } from "../components";
+import {
+  SectionWrapper,
+  ArtistsGrid,
+  PlaylistsGrid,
+  TrackList,
+} from "../components";
 import { getFeaturedPlaylists } from "../Spotify/spotifyGen";
-import { getTopArtists } from "../Spotify/spotify";
+import { getTopArtists, getRecentlyPlayed } from "../Spotify/spotify";
 import { catchErrors } from "../utils";
 import { StyledHeader } from "../styles";
 import LoginButton from "./LoginButton";
@@ -12,6 +17,7 @@ export default function Home() {
   const [token, setToken] = useState(null);
   const [playlistsData, setPlaylistsData] = useState(null);
   const [topArtists, setTopArtists] = useState({ items: [] });
+  const [recentlyPlayed, setRecentlyPlayed] = useState(null);
 
   useEffect(() => {
     setToken(accessToken);
@@ -19,11 +25,10 @@ export default function Home() {
     const fetchData = async () => {
       const { data } = await getFeaturedPlaylists();
       setPlaylistsData(data);
-
-      if (token) {
-        const userTopArtist = await getTopArtists();
-        setTopArtists(userTopArtist.data);
-      }
+      const userTopArtist = await getTopArtists();
+      setTopArtists(userTopArtist.data);
+      const { data: recentlyPlayedData } = await getRecentlyPlayed();
+      setRecentlyPlayed(recentlyPlayedData.items);
     };
 
     catchErrors(fetchData());
@@ -51,6 +56,17 @@ export default function Home() {
             </>
           ) : (
             <LoginButton text="Log in to see your top artists" />
+          )}
+        </SectionWrapper>
+        <SectionWrapper title="Recently Played">
+          {token ? (
+            <>
+              {recentlyPlayed && (
+                <TrackList tracks={recentlyPlayed.map((o) => o.track)} />
+              )}
+            </>
+          ) : (
+            <LoginButton text="Log in to see your recently played tracks" />
           )}
         </SectionWrapper>
       </main>

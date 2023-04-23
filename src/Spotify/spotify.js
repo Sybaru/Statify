@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 const LOCALSTORAGE_KEYS = {
   accessToken: "spotify_access_token",
@@ -19,19 +19,26 @@ const getAccessToken = () => {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   const queryParams = {
-    [LOCALSTORAGE_KEYS.accessToken]: urlParams.get('access_token'),
-    [LOCALSTORAGE_KEYS.refreshToken]: urlParams.get('refresh_token'),
-    [LOCALSTORAGE_KEYS.expireTime]: urlParams.get('expires_in'),
+    [LOCALSTORAGE_KEYS.accessToken]: urlParams.get("access_token"),
+    [LOCALSTORAGE_KEYS.refreshToken]: urlParams.get("refresh_token"),
+    [LOCALSTORAGE_KEYS.expireTime]: urlParams.get("expires_in"),
   };
-  const hasError = urlParams.get('error');
+  const hasError = urlParams.get("error");
 
   // If there's an error OR the token in localStorage has expired, refresh the token
-  if (hasError || hasTokenExpired() || LOCALSTORAGE_VALUES.accessToken === 'undefined') {
+  if (
+    hasError ||
+    hasTokenExpired() ||
+    LOCALSTORAGE_VALUES.accessToken === "undefined"
+  ) {
     refreshToken();
   }
 
   // If there is a valid access token in localStorage, use that
-  if (LOCALSTORAGE_VALUES.accessToken && LOCALSTORAGE_VALUES.accessToken !== 'undefined') {
+  if (
+    LOCALSTORAGE_VALUES.accessToken &&
+    LOCALSTORAGE_VALUES.accessToken !== "undefined"
+  ) {
     return LOCALSTORAGE_VALUES.accessToken;
   }
 
@@ -57,30 +64,35 @@ const hasTokenExpired = () => {
     return false;
   }
   const millisecondsElapsed = Date.now() - Number(timestamp);
-  return (millisecondsElapsed / 1000) > Number(expireTime);
+  return millisecondsElapsed / 1000 > Number(expireTime);
 };
 
 const refreshToken = async () => {
   try {
     // Logout if there's no refresh token stored or we've managed to get into a reload infinite loop
-    if (!LOCALSTORAGE_VALUES.refreshToken ||
-      LOCALSTORAGE_VALUES.refreshToken === 'undefined' ||
-      (Date.now() - Number(LOCALSTORAGE_VALUES.timestamp) / 1000) < 1000
+    if (
+      !LOCALSTORAGE_VALUES.refreshToken ||
+      LOCALSTORAGE_VALUES.refreshToken === "undefined" ||
+      Date.now() - Number(LOCALSTORAGE_VALUES.timestamp) / 1000 < 1000
     ) {
-      console.error('No refresh token available');
+      console.error("No refresh token available");
       logout();
     }
 
     // Use `/refresh_token` endpoint from our Node app
-    const { data } = await axios.get(`/refresh_token?refresh_token=${LOCALSTORAGE_VALUES.refreshToken}`);
+    const { data } = await axios.get(
+      `/refresh_token?refresh_token=${LOCALSTORAGE_VALUES.refreshToken}`
+    );
 
     // Update localStorage values
-    window.localStorage.setItem(LOCALSTORAGE_KEYS.accessToken, data.access_token);
+    window.localStorage.setItem(
+      LOCALSTORAGE_KEYS.accessToken,
+      data.access_token
+    );
     window.localStorage.setItem(LOCALSTORAGE_KEYS.timestamp, Date.now());
 
     // Reload the page for localStorage updates to be reflected
     window.location.reload();
-
   } catch (e) {
     console.error(e);
   }
@@ -95,29 +107,94 @@ export const logout = () => {
   window.location = window.location.origin;
 };
 
-export const getCurrentUserProfile = () => axios.get('/me');
+export const getCurrentUserProfile = () => axios.get("/me");
 export const accessToken = getAccessToken();
 
 export const getCurrentUserPlaylists = (limit = 20) => {
   return axios.get(`/me/playlists?limit=${limit}`);
 };
 
-export const getTopArtists = (time_range = 'short_term') => {
+export const getCurrentUserSaved = (limit = 20) => {
+  return axios.get(`/me/tracks?limit=${limit}`);
+};
+
+export const getTopArtists = (time_range = "short_term") => {
   return axios.get(`/me/top/artists?time_range=${time_range}`);
 };
 
-export const getTopTracks = (time_range = 'short_term') => {
+export const getTopTracks = (time_range = "short_term") => {
   return axios.get(`/me/top/tracks?time_range=${time_range}`);
 };
 
-export const getPlaylistById = playlist_id => {
-  return axios.get(`/playlists/${playlist_id}`);
-}
+export const userFollowsPlaylist = (playlist_id, user_id) => {
+  return axios.get(
+    `/playlists/${playlist_id}/followers/contains?ids=${user_id}`
+  );
+};
 
-export const getAudioFeaturesForTracks = ids => {
+export const getRecentlyPlayed = (limit = 20) => {
+  return axios.get(`/me/player/recently-played?limit=${limit}`);
+};
+
+export const followPlaylist = (playlist_id) => {
+  return axios.put(`/playlists/${playlist_id}/followers`);
+};
+
+export const unfollowPlaylist = (playlist_id) => {
+  return axios.delete(`/playlists/${playlist_id}/followers`);
+};
+
+export const getPlaylistById = (playlist_id) => {
+  return axios.get(`/playlists/${playlist_id}`);
+};
+
+export const getAudioFeaturesForTracks = (ids) => {
   return axios.get(`/audio-features?ids=${ids}`);
 };
 
-axios.defaults.baseURL = 'https://api.spotify.com/v1';
-axios.defaults.headers['Authorization'] = `Bearer ${accessToken}`;
-axios.defaults.headers['Content-Type'] = 'application/json';
+export const isTrackSaved = (track_id) => {
+  return axios.get(`/me/tracks/contains?ids=${track_id}`);
+};
+
+export const saveTrack = (track_ids) => {
+  return axios.put(`/me/tracks?ids=${track_ids}`);
+};
+
+export const removeTrack = (track_ids) => {
+  return axios.delete(`/me/tracks?ids=${track_ids}`);
+};
+
+export const editPlaylist = (playlist_id, name) => {
+  return axios.put(`/playlists/${playlist_id}`, {
+    name: name,
+  });
+};
+
+export const editPlaylistImage = (playlist_id, image) => {
+  return axios.put(`/playlists/${playlist_id}/images`, image, {
+    headers: { "Content-Type": "image/jpeg" },
+  });
+};
+
+export const createNewPlaylist = (user_id) => {
+  return axios.post(`/users/${user_id}/playlists`, {
+    name: "New Playlist",
+    description: "",
+  });
+};
+
+export const follow = (user_id, type) => {
+  return axios.put(`/me/following?type=${type}&ids=${user_id}`);
+};
+
+export const unfollow = (user_id, type) => {
+  return axios.delete(`/me/following?type=${type}&ids=${user_id}`);
+};
+
+export const checkFollowing = (type, ids) => {
+  return axios.get(`/me/following/contains?type=${type}&ids=${ids}`);
+};
+
+axios.defaults.baseURL = "https://api.spotify.com/v1";
+axios.defaults.headers["Authorization"] = `Bearer ${accessToken}`;
+axios.defaults.headers["Content-Type"] = "application/json";

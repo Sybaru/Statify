@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { catchErrors } from "../utils";
+import { catchErrors, convertImageToJpeg } from "../utils";
 import {
   getPlaylistById,
   getAudioFeaturesForTracks,
@@ -8,15 +8,15 @@ import {
 import {
   accessToken,
   getCurrentUserProfile,
-  unfollowPlaylist,
-  userFollowsPlaylist,
-  followPlaylist,
+  editPlaylist,
+  editPlaylistImage,
 } from "../Spotify/spotify";
 import { StyledHeader, StyledDropdown } from "../styles";
 import { TrackList, SectionWrapper } from "../components";
 import axios from "axios";
+import styled from "styled-components";
 
-const Playlist = () => {
+const PlaylistEdit = () => {
   const { id } = useParams();
   const [token, setToken] = useState(accessToken);
   const [profile, setProfile] = useState(null);
@@ -25,28 +25,49 @@ const Playlist = () => {
   const [tracks, setTracks] = useState(null);
   const [audioFeatures, setAudioFeatures] = useState(null);
   const [sortValue, setSortValue] = useState("");
-  const [followed, setFollowed] = useState(false);
   const sortOptions = ["danceability", "tempo", "energy"];
+  const [selectedImage, setSelectedImage] = useState("/defaultplaylist.png");
+  const [playlistName, setPlaylistName] = useState("Playlist");
+  const [newName, setNewName] = useState("Playlist");
+  const hiddenFileInput = useRef(null);
+  const validImageTypes = ["image/gif", "image/jpeg", "image/png"];
+
+  const upload = async (image) => {
+    const uploadImage = image.split(",")[1];
+    editPlaylistImage(id, uploadImage);
+  };
+
+  const uploadImage = async () => {
+    convertImageToJpeg(selectedImage, upload);
+  };
 
   const handleEdit = () => {
-    if (token) {
-      console.log(profile);
-      if (playlist.owner.id !== profile.id) {
-        alert("You can only edit your own playlists");
-      } else {
-        window.location.href = `/edit/${id}`;
-      }
-    } else {
-      alert("You need to be logged in to edit this playlist");
+    console.log(selectedImage);
+    if (selectedImage !== "/defaultplaylist.png") {
+      uploadImage();
+    }
+
+    editPlaylist(id, newName);
+  };
+
+  const handleNameChange = (e) => {
+    if (e.currentTarget.textContent !== playlistName) {
+      setNewName(e.currentTarget.textContent);
     }
   };
 
-  const tracksForTracklist = useMemo(() => {
-    if (!tracks) {
+  const handleImage = () => {
+    hiddenFileInput.current.click();
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!validImageTypes.includes(file.type)) {
+      alert("Please select a valid Image file");
       return;
     }
-    return tracks.map(({ track }) => track);
-  }, [tracks]);
+    setSelectedImage(URL.createObjectURL(file));
+  };
 
   const tracksWithAudioFeatures = useMemo(() => {
     if (!tracks || !audioFeatures) {
@@ -96,9 +117,17 @@ const Playlist = () => {
   useEffect(() => {
     setToken(accessToken);
 
+    if (!token) {
+      window.location.href = `/playlist/${id}`;
+    }
+
     const fetchData = async () => {
+
       const { data } = await getCurrentUserProfile();
       setProfile(data);
+      if (data.id !== playlist.owner.id) {
+        window.location.href = `/playlist/${id}`;
+      }
     };
 
     catchErrors(fetchData());
@@ -109,34 +138,26 @@ const Playlist = () => {
       const { data } = await getPlaylistById(id);
       setPlaylist(data);
       setTracksData(data.tracks);
+      if (data.images[0] !== undefined) {
+        setSelectedImage(data.images[0].url);
+      }
+      if (data.name !== undefined) {
+        setPlaylistName(data.name);
+      }
       if (data && data.name !== "AxiosError") {
         document.title = data.name;
       }
+      console.log("request");
     };
 
     catchErrors(fetchData());
   }, [id]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const { data } = await userFollowsPlaylist(id, profile.id);
-      setFollowed(data[0]);
-      console.log(data[0]);
-    };
-
-    if (profile) {
-      catchErrors(fetchData());
-    }
-  }, [profile, id]);
-
-  // When tracksData updates, compile arrays of tracks and audioFeatures
-  useEffect(() => {
     if (!tracksData) {
       return;
     }
 
-    // When tracksData updates, check if there are more tracks to fetch
-    // then update the state variable
     const fetchMoreData = async () => {
       if (tracksData.next) {
         const { data } = await axios.get(tracksData.next);
@@ -146,7 +167,6 @@ const Playlist = () => {
     setTracks((tracks) => [...(tracks ? tracks : []), ...tracksData.items]);
     catchErrors(fetchMoreData());
 
-    // Also update the audioFeatures state variable using the track IDs
     const fetchAudioFeatures = async () => {
       const ids = tracksData.items.map(({ track }) => track.id).join(",");
       const { data } = await getAudioFeaturesForTracks(ids);
@@ -164,22 +184,35 @@ const Playlist = () => {
         <>
           <StyledHeader>
             <div className="header__inner">
-              {playlist.images.length && playlist.images[0].url ? (
+              <StyledImageButton onClick={handleImage}>
                 <img
                   className="header__img"
-                  src={playlist.images[0].url}
+                  src={selectedImage}
                   alt="Playlist Artwork"
                 />
-              ) : (
-                <img
-                  className="header__img"
-                  src="/defaultplaylist.png"
-                  alt="Playlist Artwork"
-                />
-              )}
+              </StyledImageButton>
+              <input
+                type="file"
+                ref={hiddenFileInput}
+                onChange={(event) => {
+                  handleImageUpload(event);
+                }}
+                style={{ display: "none" }}
+              />
               <div>
                 <div className="header__overline">Playlist</div>
-                <h1 className="header__name">{playlist.name}</h1>
+                <div>
+                  <h1
+                    className="header__name edit__name"
+                    contentEditable="true"
+                    onInput={(e) =>
+                      handleNameChange(e)
+                    }
+                  >
+                    {playlistName}
+                  </h1>
+                </div>
+
                 <p className="header__meta">
                   {playlist.owner.display_name ? (
                     <span className="artists">
@@ -190,33 +223,8 @@ const Playlist = () => {
                     {playlist.tracks.total}{" "}
                     {`song${playlist.tracks.total !== 1 ? "s" : ""}`}
                     <button className="edit__button" onClick={handleEdit}>
-                      Edit Playlist
+                      Save
                     </button>
-                    {profile ? (
-                      <>
-                        {followed ? (
-                          <button
-                            className="edit__button"
-                            onClick={() => {
-                              unfollowPlaylist(id);
-                              setFollowed(false);
-                            }}
-                          >
-                            Remove From Saved
-                          </button>
-                        ) : (
-                          <button
-                            className="edit__button"
-                            onClick={() => {
-                              followPlaylist(id);
-                              setFollowed(true);
-                            }}
-                          >
-                            Save
-                          </button>
-                        )}
-                      </>
-                    ) : null}
                   </span>
                 </p>
               </div>
@@ -255,4 +263,22 @@ const Playlist = () => {
   );
 };
 
-export default Playlist;
+export default PlaylistEdit;
+
+const StyledImageButton = styled.button`
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: var(--border-radius-pill);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: var(--white);
+  font-size: var(--fz-sm);
+  font-weight: 700;
+  width: 275px;
+  margin-right: var(--spacing-lg);
+
+  &:hover {
+    background-color: var(--dark-grey);
+    outline: 0;
+  }
+`;

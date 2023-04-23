@@ -8,9 +8,17 @@ import {
   getArtistTopTracks,
   getArtistAlbums,
 } from "../Spotify/spotifyGen";
+import {
+  follow,
+  unfollow,
+  accessToken,
+  checkFollowing,
+} from "../Spotify/spotify";
 
 const Artist = () => {
   const { id } = useParams();
+  const [token, setToken] = useState(accessToken);
+  const [followed, setFollowed] = useState(false);
   const [artist, setArtist] = useState();
   const [topTracks, setTopTracks] = useState(null);
   const [albums, setAlbums] = useState(null);
@@ -21,22 +29,28 @@ const Artist = () => {
   };
 
   useEffect(() => {
+    setToken(accessToken);
+
     const fetchData = async () => {
       const { data } = await getArtistById(id);
       setArtist(data);
-      console.log(data);
+      if (data && data.name !== "AxiosError") {
+        document.title = data.name;
+      }
+
+      const isFollowing = await checkFollowing("artist", id);
+      setFollowed(isFollowing.data[0]);
 
       const artistTopTracks = await getArtistTopTracks(id);
       setTopTracks(artistTopTracks.data);
-      console.log(artistTopTracks.data);
 
       const artistAlbums = await getArtistAlbums(id);
       setAlbums(artistAlbums.data);
-      console.log(artistAlbums.data);
+      console.log("request");
     };
 
     catchErrors(fetchData());
-  }, []);
+  }, [id]);
 
   return (
     <div>
@@ -55,6 +69,7 @@ const Artist = () => {
                     />
                   )}
                 <div>
+                  <div className="header__overline">Artist</div>
                   <h1 className="header__name">{artist.name}</h1>
                   <p className="header__meta">
                     <span>
@@ -66,6 +81,33 @@ const Artist = () => {
                         </>
                       ) : (
                         <>0 Followers</>
+                      )}
+                      {token ? (
+                        <>
+                          {followed ? (
+                            <button
+                              onClick={() => {
+                                catchErrors(unfollow(id, "artist"));
+                                setFollowed(false);
+                              }}
+                              style={{ marginLeft: "1rem" }}
+                            >
+                              Following
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                catchErrors(follow(id, "artist"));
+                                setFollowed(true);
+                              }}
+                              style={{ marginLeft: "1rem" }}
+                            >
+                              Follow
+                            </button>
+                          )}
+                        </>
+                      ) : (
+                        <></>
                       )}
                     </span>
                   </p>

@@ -1,4 +1,4 @@
-import styled from 'styled-components/macro';
+import styled from "styled-components/macro";
 
 const StyledTrackList = styled.ul`
   list-style: none;
@@ -72,6 +72,12 @@ const StyledTrackList = styled.ul`
       justify-content: flex-end;
       font-variant-numeric: tabular-nums;
     }
+  }
+
+  .track__item__interact {
+    justify-content: flex-end;
+    font-variant-numeric: tabular-nums;
+    margin-right: 10px;
   }
 `;
 

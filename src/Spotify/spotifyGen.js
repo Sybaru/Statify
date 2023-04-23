@@ -1,11 +1,5 @@
 import axios from "axios";
 
-var genToken;
-
-const setGenToken = (token) => {
-  genToken = token;
-};
-
 export const getPlaylistById = (playlist_id) => {
   return axios.get(`http://localhost:3001/playlists/?id=${playlist_id}`);
 };
@@ -41,4 +35,24 @@ export const getUser = (user_id) => {
 
 export const getUserPLaylists = (user_id) => {
   return axios.get(`http://localhost:3001/user-playlists/?id=${user_id}`);
+};
+
+export const getTrackbyId = (track_id) => {
+  return axios.get(`http://localhost:3001/track/?id=${track_id}`);
+}
+
+export const getTrackRecommendations = (seed_tracks) => {
+  return axios.get(`http://localhost:3001/recommendations/?seed_tracks=${seed_tracks}`,{ crossDomain: true });
+}
+
+export const getTrackRecommendationsByGenre = (seed_genres) => {
+  return axios.get(`http://localhost:3001/recommendations/?seed_genres=${seed_genres}`,{ crossDomain: true });
+}
+
+export const getTrackRecommendationsByArtist = (seed_artists) => {
+  return axios.get(`http://localhost:3001/recommendations/?seed_artists=${seed_artists}`,{ crossDomain: true });
+}
+
+export const search = (query) => {
+  return axios.get(`http://localhost:3001/search/?q=${query}`);
 };

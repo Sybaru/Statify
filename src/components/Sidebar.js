@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHouse, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faHouse, faUser, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 
 const Sidebar = () => {
   return (
@@ -10,7 +10,7 @@ const Sidebar = () => {
       <div className="top__links">
         <div className="logo">
           <img
-            src="https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_RGB_White.png"
+            src="/statify2.png"
             alt="spotify"
           />
         </div>
@@ -19,6 +19,12 @@ const Sidebar = () => {
             <NavLink to="/" className="sidebar_item">
               <FontAwesomeIcon icon={faHouse} className="sidebar_icon" />
               Home
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/search" className="sidebar_item">
+              <FontAwesomeIcon icon={faMagnifyingGlass} className="sidebar_icon" />
+              Search
             </NavLink>
           </li>
           <li>

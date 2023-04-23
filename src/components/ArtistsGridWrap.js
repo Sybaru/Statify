@@ -1,7 +1,7 @@
 import { StyledGridWrap } from '../styles';
 import { Link } from 'react-router-dom';
 
-const ArtistsGridWrap = ({ artists, wr }) => (
+const ArtistsGridWrap = ({ artists}) => (
   <>
     {artists && artists.length ? (
       <StyledGridWrap type="artist">

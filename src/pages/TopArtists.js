@@ -18,7 +18,7 @@ const TopArtists = () => {
 
   return (
     <main>
-      <SectionWrapper title="Top Artists" breadcrumb={true}>
+      <SectionWrapper title="Top Artists" breadcrumb={true} returnlink="/profile">
         <TimeRangeButtons
           activeRange={activeRange}
           setActiveRange={setActiveRange}

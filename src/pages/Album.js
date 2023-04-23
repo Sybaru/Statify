@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { getAlbumById } from "../Spotify/spotifyGen";
 import { catchErrors } from "../utils";
 import { StyledHeader } from "../styles";
-import { TrackList, SectionWrapper } from "../components";
+import { TrackList, SectionWrapper} from "../components";
 
 const Album = () => {
   const { id } = useParams();
@@ -27,12 +27,14 @@ const Album = () => {
   useEffect(() => {
     const fetchData = async () => {
       const { data } = await getAlbumById(id);
-      if (data.name !== "AxiosError") {
+      if (data && data.name !== "AxiosError") {
         setAlbum(data);
         setTracks(data.tracks.items);
+        document.title = data.name;
       }
-      console.log(data);
+      console.log("request");
     };
+
 
     catchErrors(fetchData());
   }, [id]);

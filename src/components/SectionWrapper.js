@@ -1,14 +1,14 @@
 import { Link } from 'react-router-dom';
 import { StyledSection } from '../styles';
 
-const SectionWrapper = ({ children, title, seeAllLink, breadcrumb, subtitle }) => (
+const SectionWrapper = ({ children, title, seeAllLink, breadcrumb, subtitle, returnlink = "/" }) => (
   <StyledSection>
     <div className="section__inner">
       <div className="section__top">
         <h2 className="section__heading">
           {breadcrumb && (
             <span className="section__breadcrumb">
-              <Link to="/">Profile</Link>
+              <Link to={returnlink}>Profile</Link>
             </span>
           )}
           {title && (
