@@ -1,4 +1,5 @@
 import styled from "styled-components/macro";
+import { API_BASE } from "../Spotify/spotifyGen";
 
 const StyledLoginButton = styled.a`
   display: inline-block;
@@ -17,7 +18,7 @@ const StyledLoginButton = styled.a`
 `;
 
 const LoginButton = (text) => (
-  <StyledLoginButton href="http://localhost:3001/login">
+  <StyledLoginButton href={API_BASE + "/login"}>
     {!text.text ? (
       <>
         <span>Log in with Spotify </span>
