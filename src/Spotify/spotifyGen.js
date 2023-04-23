@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const API_BASE = "https://statify-back.vercel.app";
+export const API_BASE = process.env.APP_API_BASE || "http://localhost:3001";
 
 export const getPlaylistById = (playlist_id) => {
   return axios.get(`${API_BASE}/playlists/?id=${playlist_id}`);
