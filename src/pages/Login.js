@@ -27,7 +27,7 @@ const StyledLoginButton = styled.a`
 
 const Login = (text) => (
   <StyledLoginContainer>
-    <StyledLoginButton href= {API_BASE + "/login"}>
+    <StyledLoginButton href= {process.env.APP_API_BASE + "/login"}>
       {!text.text ? (<><span>Log in with Spotify </span></>) : (<span>{text.text}</span>)}
     </StyledLoginButton>
   </StyledLoginContainer>

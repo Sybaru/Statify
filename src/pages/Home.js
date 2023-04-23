@@ -19,6 +19,8 @@ export default function Home() {
   const [topArtists, setTopArtists] = useState({ items: [] });
   const [recentlyPlayed, setRecentlyPlayed] = useState(null);
 
+  console.log(process.env.APP_API_BASE);
+
   useEffect(() => {
     setToken(accessToken);
 
