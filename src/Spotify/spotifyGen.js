@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const API_BASE = process.env.APP_API_BASE || "http://localhost:3001";
+export const API_BASE = process.env.APP_API_BASE;
 
 export const getPlaylistById = (playlist_id) => {
   return axios.get(`${API_BASE}/playlists/?id=${playlist_id}`);
