@@ -1,8 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { accessToken, logout } from "../Spotify/spotify";
+import { accessToken, logout, getCurrentUserProfile } from "../Spotify/spotify";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import axios from "axios";
 import Profile from "./Profile";
 import Login from "./Login";
 import TopArtists from "./TopArtists";
@@ -21,6 +20,7 @@ import Search from "./Search";
 import styled from "styled-components/macro";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { catchErrors } from "../utils";
 
 const StyledLogoutButton = styled.button`
   position: absolute;
@@ -61,6 +61,7 @@ const Absolute = styled.div`
 
 export default function Body() {
   const [token, setToken] = useState(null);
+  const [user, setUser] = useState(null);
   let navigate = useNavigate();
 
   const goLogin = () => {
@@ -70,6 +71,14 @@ export default function Body() {
 
   useEffect(() => {
     setToken(accessToken);
+
+    const fetchData = async () => {
+      const { data } = await getCurrentUserProfile();
+      setUser(data);
+      console.log(data);
+    };
+
+    catchErrors(fetchData());
   }, []);
 
   return (
@@ -84,7 +93,11 @@ export default function Body() {
       </Absolute>
 
       {token ? (
-        <StyledLogoutButton onClick={logout}>Log Out</StyledLogoutButton>
+        <>
+          <StyledLogoutButton onClick={logout}>
+            Log Out of {user && <>{user.display_name}</>}
+          </StyledLogoutButton>
+        </>
       ) : (
         <StyledLogoutButton onClick={goLogin}>Log in</StyledLogoutButton>
       )}
