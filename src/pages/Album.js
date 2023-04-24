@@ -2,12 +2,20 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getAlbumById } from "../Spotify/spotifyGen";
+import {
+  follow,
+  unfollow,
+  accessToken,
+  checkFollowing,
+} from "../Spotify/spotify";
 import { catchErrors } from "../utils";
 import { StyledHeader } from "../styles";
-import { TrackList, SectionWrapper} from "../components";
+import { TrackList, SectionWrapper } from "../components";
 
 const Album = () => {
   const { id } = useParams();
+  const [token, setToken] = useState(null);
+  const [followed, setFollowed] = useState(false);
   const [album, setAlbum] = useState(null);
   const [tracks, setTracks] = useState(null);
 
@@ -19,12 +27,14 @@ const Album = () => {
     const hours = Math.floor(totalDuration / 3600000);
     const minutes = Math.floor(totalDuration / 60000);
     const seconds = ((totalDuration % 60000) / 1000).toFixed(0);
-    return `${hours ? hours + " hours" : ""} ${minutes ? minutes + " min" : ""} ${
-        seconds ? seconds + " sec" : ""
-    }`;
+    return `${hours ? hours + " hours" : ""} ${
+      minutes ? minutes + " min" : ""
+    } ${seconds ? seconds + " sec" : ""}`;
   };
 
   useEffect(() => {
+    setToken(accessToken);
+
     const fetchData = async () => {
       const { data } = await getAlbumById(id);
       if (data && data.name !== "AxiosError") {
@@ -32,9 +42,12 @@ const Album = () => {
         setTracks(data.tracks.items);
         document.title = data.name;
       }
+
+      const isFollowing = await checkFollowing("album", id);
+      setFollowed(isFollowing.data[0]);
+
       console.log("request");
     };
-
 
     catchErrors(fetchData());
   }, [id]);
@@ -64,7 +77,33 @@ const Album = () => {
                       {album.release_date.split("-")[0]}
                     </span>
                     <span className="songs">{album.total_tracks} songs</span>
-                    <span className="time">{getAlbumLength(album.tracks.items)}</span>
+                    <span className="time">
+                      {getAlbumLength(album.tracks.items)}
+
+                      {token && (
+                        <>
+                          {followed ? (
+                            <button
+                              onClick={() => {
+                                unfollow("album", id)
+                                setFollowed(false);
+                                }}
+                            >
+                              Unfollow
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                follow("album", id);
+                                setFollowed(true);
+                              }}
+                            >
+                              Follow
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </span>
                   </p>
                 </div>
               </>

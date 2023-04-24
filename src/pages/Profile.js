@@ -9,6 +9,7 @@ import {
   getTopTracks,
   getCurrentUserSaved,
   getRecentlyPlayed,
+  getFollowedArtists,
 } from "../Spotify/spotify";
 import { catchErrors } from "../utils";
 import Login from "./Login";
@@ -29,6 +30,7 @@ export default function Profile() {
   const [topTracks, setTopTracks] = useState({ items: [] });
   const [savedTracks, setSavedTracks] = useState(null);
   const [recentlyPlayed, setRecentlyPlayed] = useState(null);
+  const [followedArtists, setFollowedArtists] = useState(null);
 
   useEffect(() => {
     setToken(accessToken);
@@ -55,6 +57,9 @@ export default function Profile() {
 
       const { data: recentlyPlayedData } = await getRecentlyPlayed();
       setRecentlyPlayed(recentlyPlayedData.items);
+
+      const { data: followedArtistsData } = await getFollowedArtists();
+      setFollowedArtists(followedArtistsData.artists.items);
     };
 
     catchErrors(fetchData());
@@ -110,6 +115,13 @@ export default function Profile() {
                         seeAllLink="/top-artists"
                       >
                         <ArtistsGrid artists={topArtists.items.slice(0, 10)} />
+                      </SectionWrapper>
+
+                      <SectionWrapper
+                        title="Followed artists"
+                        seeAllLink="/followed-artists"
+                      >
+                        <ArtistsGrid artists={followedArtists.slice(0, 10)} />
                       </SectionWrapper>
 
                       <SectionWrapper

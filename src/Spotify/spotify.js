@@ -184,16 +184,30 @@ export const createNewPlaylist = (user_id) => {
 };
 
 export const follow = (user_id, type) => {
+  if (type === "album") {
+    return axios.put(`/me/albums?ids=${user_id}`);
+  }
   return axios.put(`/me/following?type=${type}&ids=${user_id}`);
 };
 
 export const unfollow = (user_id, type) => {
+  if (type === "album") {
+    return axios.delete(`/me/albums?ids=${user_id}`);
+  }
   return axios.delete(`/me/following?type=${type}&ids=${user_id}`);
 };
 
 export const checkFollowing = (type, ids) => {
+  if (type === "album") {
+    return axios.get(`/me/albums/contains?ids=${ids}`);
+  }
   return axios.get(`/me/following/contains?type=${type}&ids=${ids}`);
 };
+
+export const getFollowedArtists = (limit = 20) => {
+  return axios.get(`/me/following?type=artist&limit=${limit}`);
+};
+
 
 axios.defaults.baseURL = "https://api.spotify.com/v1";
 axios.defaults.headers["Authorization"] = `Bearer ${accessToken}`;
