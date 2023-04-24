@@ -108,7 +108,7 @@ export default function Profile() {
 
               <main>
                 <div>
-                  {topArtists && topTracks && playlists ? (
+                  {topArtists && topTracks && playlists && followedArtists ? (
                     <>
                       <SectionWrapper
                         title="Top artists this month"
