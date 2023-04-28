@@ -85,13 +85,19 @@ export default function Profile() {
             <>
               <StyledHeader type="user">
                 <div className="header__inner">
-                  {profile.images.length && profile.images[0].url && (
+                  {profile.images.length && profile.images[0].url ? (
                     <img
                       className="header__img"
                       src={profile.images[0].url}
                       alt="Avatar"
                     />
-                  )}
+                  ) : (
+                    <img
+                      className="header__img"
+                      src="/default.jpg"
+                      alt="Avatar"
+                      />
+                      )}
                   <div>
                     <div className="header__overline">Profile</div>
                     <h1 className="header__name">{profile.display_name}</h1>
