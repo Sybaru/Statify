@@ -1,5 +1,7 @@
 import axios from "axios";
 
+export const API_BASE = "https://statify-back.vercel.app";
+
 const LOCALSTORAGE_KEYS = {
   accessToken: "spotify_access_token",
   refreshToken: "spotify_refresh_token",
@@ -207,7 +209,6 @@ export const checkFollowing = (type, ids) => {
 export const getFollowedArtists = (limit = 20) => {
   return axios.get(`/me/following?type=artist&limit=${limit}`);
 };
-
 
 axios.defaults.baseURL = "https://api.spotify.com/v1";
 axios.defaults.headers["Authorization"] = `Bearer ${accessToken}`;

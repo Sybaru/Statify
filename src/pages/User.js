@@ -10,7 +10,13 @@ import {
 import { getUser, getUserPLaylists } from "../Spotify/spotifyGen";
 import { catchErrors } from "../utils";
 import { StyledHeader } from "../styles";
-import { PlaylistsGrid, SectionWrapper, Loader } from "../components";
+import { getUserReviews } from "../mongo";
+import {
+  PlaylistsGrid,
+  SectionWrapper,
+  Loader,
+  ReviewList,
+} from "../components";
 
 export default function User() {
   const { id } = useParams();
@@ -18,6 +24,7 @@ export default function User() {
   const [user, setUser] = useState(null);
   const [userPlaylists, setUserPlaylists] = useState(null);
   const [followed, setFollowed] = useState(false);
+  const [reviews, setReviews] = useState(null);
 
   useEffect(() => {
     setToken(accessToken);
@@ -34,6 +41,9 @@ export default function User() {
 
       const userPlaylists = await getUserPLaylists(id);
       setUserPlaylists(userPlaylists.data);
+
+      const reviews = await getUserReviews(id);
+      setReviews(reviews);
       console.log("req");
     };
 
@@ -109,6 +119,9 @@ export default function User() {
                   seeAllLink="/playlists"
                 >
                   <PlaylistsGrid playlists={userPlaylists.items.slice(0, 10)} />
+                </SectionWrapper>
+                <SectionWrapper title="Reviews">
+                  <ReviewList reviews={reviews} />
                 </SectionWrapper>
               </>
             ) : (

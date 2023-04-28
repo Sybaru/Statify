@@ -60,14 +60,16 @@ const Artist = () => {
             {artist ? (
               <div className="header__inner">
                 {artist.images &&
-                  artist.images.length &&
-                  artist.images[0].url && (
-                    <img
-                      className="header__img"
-                      src={artist.images[0].url}
-                      alt="Avatar"
-                    />
-                  )}
+                artist.images.length &&
+                artist.images[0].url ? (
+                  <img
+                    className="header__img"
+                    src={artist.images[0].url}
+                    alt="Avatar"
+                  />
+                ) : (
+                  <img className="header__img" src="default.jpg" alt="Avatar" />
+                )}
                 <div>
                   <div className="header__overline">Artist</div>
                   <h1 className="header__name">{artist.name}</h1>

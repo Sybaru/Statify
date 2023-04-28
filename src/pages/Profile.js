@@ -2,7 +2,6 @@ import React from "react";
 import { useEffect, useState } from "react";
 import {
   accessToken,
-  logout,
   getCurrentUserProfile,
   getCurrentUserPlaylists,
   getTopArtists,
@@ -20,7 +19,9 @@ import {
   TrackList,
   PlaylistsGrid,
   Loader,
+  ReviewList,
 } from "../components";
+import { getUserReviews } from "../mongo";
 
 export default function Profile() {
   const [token, setToken] = useState(null);
@@ -31,6 +32,7 @@ export default function Profile() {
   const [savedTracks, setSavedTracks] = useState(null);
   const [recentlyPlayed, setRecentlyPlayed] = useState(null);
   const [followedArtists, setFollowedArtists] = useState(null);
+  const [reviews, setReviews] = useState(null);
 
   useEffect(() => {
     setToken(accessToken);
@@ -41,6 +43,9 @@ export default function Profile() {
       if (data && data.name !== "AxiosError") {
         document.title = `${data.display_name}'s Profile`;
       }
+
+      const userReviews = await getUserReviews(data.id);
+      setReviews(userReviews);
 
       const userPlaylists = await getCurrentUserPlaylists();
       setPlaylists(userPlaylists.data);
@@ -160,6 +165,13 @@ export default function Profile() {
                           />
                         )}
                       </SectionWrapper>
+                      {reviews && (
+                        <SectionWrapper
+                          title="Your Reviews"
+                        >
+                          <ReviewList reviews={reviews} />
+                        </SectionWrapper>
+                      )}
                     </>
                   ) : (
                     <Loader />

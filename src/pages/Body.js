@@ -17,6 +17,7 @@ import Saved from "./Saved";
 import PlaylistEdit from "./PlaylistEdit";
 import RecentlyPlayed from "./RecentlyPlayed";
 import Search from "./Search";
+import Admin from "./Admin";
 import styled from "styled-components/macro";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -75,7 +76,6 @@ export default function Body() {
     const fetchData = async () => {
       const { data } = await getCurrentUserProfile();
       setUser(data);
-      console.log(data);
     };
 
     catchErrors(fetchData());
@@ -119,6 +119,7 @@ export default function Body() {
         <Route path="/search/:query" element={<Search />} />
         <Route path="/saved" element={<Saved />} />
         <Route path="/recently-played" element={<RecentlyPlayed />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Home />} />
       </Routes>

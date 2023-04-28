@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { accessToken } from "../Spotify/spotify";
 import { getTrackbyId, getTrackRecommendations } from "../Spotify/spotifyGen";
+import MakeReview from "../components/MakeReview";
+import { getItemReviews } from "../mongo";
 import { catchErrors } from "../utils";
 import { StyledHeader } from "../styles";
 import {
@@ -10,12 +12,14 @@ import {
   SectionWrapper,
   Loader,
   TrackList,
+  ReviewList,
 } from "../components";
 
 export default function Track() {
   const { id } = useParams();
   const [track, setTrack] = useState(null);
   const [recommendations, setRecommendations] = useState({ tracks: [] });
+  const [reviews, setReviews] = useState(null);
 
   const getTrackLength = (track) => {
     let totalDuration = track.duration_ms;
@@ -34,7 +38,12 @@ export default function Track() {
       const { data: recommendations } = await getTrackRecommendations(data.id);
       setRecommendations(recommendations);
 
-      console.log(recommendations);
+      if (id) {
+        const reviews = await getItemReviews(id, "track");
+        setReviews(reviews);
+      }
+
+      console.log(id);
     };
 
     catchErrors(fetchData());
@@ -69,10 +78,12 @@ export default function Track() {
             </div>
           </StyledHeader>
           <main>
-            <SectionWrapper
-              title="Similar Tracks"
-            >
+            <SectionWrapper title="Similar Tracks">
               <TrackList tracks={recommendations.tracks.slice(0, 10)} />
+            </SectionWrapper>
+            <SectionWrapper title="Reviews">
+              <MakeReview type="track" item={track} />
+              <ReviewList reviews={reviews} />
             </SectionWrapper>
           </main>
         </>

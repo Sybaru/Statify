@@ -8,9 +8,11 @@ import {
   accessToken,
   checkFollowing,
 } from "../Spotify/spotify";
+import { getItemReviews } from "../mongo";
 import { catchErrors } from "../utils";
 import { StyledHeader } from "../styles";
-import { TrackList, SectionWrapper } from "../components";
+import { TrackList, SectionWrapper, ReviewList } from "../components";
+import MakeReview from "../components/MakeReview";
 
 const Album = () => {
   const { id } = useParams();
@@ -18,6 +20,7 @@ const Album = () => {
   const [followed, setFollowed] = useState(false);
   const [album, setAlbum] = useState(null);
   const [tracks, setTracks] = useState(null);
+  const [reviews, setReviews] = useState(null);
 
   const getAlbumLength = (tracks) => {
     let totalDuration = 0;
@@ -45,6 +48,9 @@ const Album = () => {
 
       const isFollowing = await checkFollowing("album", id);
       setFollowed(isFollowing.data[0]);
+
+      const reviews = await getItemReviews(id, "album");
+      setReviews(reviews);
 
       console.log("request");
     };
@@ -85,9 +91,9 @@ const Album = () => {
                           {followed ? (
                             <button
                               onClick={() => {
-                                unfollow("album", id)
+                                unfollow("album", id);
                                 setFollowed(false);
-                                }}
+                              }}
                             >
                               Unfollow
                             </button>
@@ -113,6 +119,10 @@ const Album = () => {
       <main>
         <SectionWrapper title="Tracks">
           {tracks && <TrackList tracks={tracks} />}
+        </SectionWrapper>
+        <SectionWrapper title="Reviews">
+          <MakeReview type="album" item={album} />
+          <ReviewList reviews={reviews} />
         </SectionWrapper>
       </main>
     </div>

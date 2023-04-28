@@ -9,3 +9,5 @@ export { default as TimeRangeButtons } from './TimeRangeButtons';
 export { default as Loader } from './Loader';
 export {default as AlbumGrid} from './AlbumGrid';
 export {default as SaveInteract} from './SaveInteract';
+export {default as UserGrid} from './UserGrid';
+export {default as ReviewList} from './ReviewList';

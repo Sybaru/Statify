@@ -12,6 +12,7 @@ import { getTopArtists, getRecentlyPlayed } from "../Spotify/spotify";
 import { catchErrors } from "../utils";
 import { StyledHeader } from "../styles";
 import LoginButton from "./LoginButton";
+import { user } from "../mongo";
 
 export default function Home() {
   const [token, setToken] = useState(null);
@@ -20,6 +21,11 @@ export default function Home() {
   const [recentlyPlayed, setRecentlyPlayed] = useState(null);
 
   console.log(process.env.APP_API_BASE);
+
+  const testUser = async () => {
+    const mongoUser = await user("ayz975");
+    console.log(mongoUser);
+  };
 
   useEffect(() => {
     setToken(accessToken);

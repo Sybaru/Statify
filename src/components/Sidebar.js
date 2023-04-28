@@ -2,17 +2,39 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHouse, faUser, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import {
+  faHouse,
+  faUser,
+  faMagnifyingGlass,
+  faLock,
+} from "@fortawesome/free-solid-svg-icons";
+import { getCurrentUserProfile } from "../Spotify/spotify";
+import { user } from "../mongo";
+import { useState, useEffect } from "react";
+import { catchErrors } from "../utils";
 
 const Sidebar = () => {
+  const [mongoUser, setmongoUser] = useState(null);
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data } = await getCurrentUserProfile();
+      setProfile(data);
+
+      if (data) {
+        const data2 = await user(data.id);
+        setmongoUser(data2);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <Container>
       <div className="top__links">
         <div className="logo">
-          <img
-            src="/statify2.png"
-            alt="spotify"
-          />
+          <img src="/statify2.png" alt="spotify" />
         </div>
         <ul>
           <li>
@@ -23,7 +45,10 @@ const Sidebar = () => {
           </li>
           <li>
             <NavLink to="/search" className="sidebar_item">
-              <FontAwesomeIcon icon={faMagnifyingGlass} className="sidebar_icon" />
+              <FontAwesomeIcon
+                icon={faMagnifyingGlass}
+                className="sidebar_icon"
+              />
               Search
             </NavLink>
           </li>
@@ -33,6 +58,14 @@ const Sidebar = () => {
               Profile
             </NavLink>
           </li>
+          {mongoUser && mongoUser.admin && (
+            <li>
+              <NavLink to="/admin" className="sidebar_item">
+                <FontAwesomeIcon icon={faLock} className="sidebar_icon" />
+                Admin
+              </NavLink>
+            </li>
+          )}
         </ul>
       </div>
     </Container>
