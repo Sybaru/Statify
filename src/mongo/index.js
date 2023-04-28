@@ -4,7 +4,7 @@ export const API_BASE = "https://statify-back.vercel.app";
 
 const makeUser = async (spotify) => {
   const user = await axios
-    .post(API_BASE + "/api/users", {
+    .post(API_BASE + "/api/makeusers", {
       spotify: spotify,
       admin: false,
     })
