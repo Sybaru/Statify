@@ -52,7 +52,7 @@ export const getAllReviews = async () => {
 
 export const getUserReviews = async (spotify) => {
   const reviews = await axios
-    .get(API_BASE + `/api/reviews/?user=${spotify}`)
+    .get(API_BASE + `/api/reviews/${spotify}`)
     .then((res) => {
       return res.data;
     });
