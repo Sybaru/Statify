@@ -82,7 +82,7 @@ export default function Track() {
               <TrackList tracks={recommendations.tracks.slice(0, 10)} />
             </SectionWrapper>
             <SectionWrapper title="Reviews">
-              <MakeReview type="track" item={track} />
+              <MakeReview type={"track"} item={track} />
               <ReviewList reviews={reviews} />
             </SectionWrapper>
           </main>

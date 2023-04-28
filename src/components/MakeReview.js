@@ -49,9 +49,9 @@ export default function MakeReview(type, item) {
   const handleSubmit = () => {
     const review = {};
     review.liked = liked;
-    review.type = type.type;
+    review.type = type;
     review.user = profile.id;
-    review.reviewedId = type.item.id;
+    review.reviewedId = item.id;
     review.review = reviewText;
     makeNewReview(review);
     setOpen(false);

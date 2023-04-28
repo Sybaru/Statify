@@ -121,7 +121,7 @@ const Album = () => {
           {tracks && <TrackList tracks={tracks} />}
         </SectionWrapper>
         <SectionWrapper title="Reviews">
-          <MakeReview type="album" item={album} />
+          <MakeReview type={"album"} item={album} />
           <ReviewList reviews={reviews} />
         </SectionWrapper>
       </main>
